@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
     return res.status(200).send(err || response || msg)
   } catch (e) {
     logger.error(e)
-    return res.status(500).send('Error adding message')
+    return res.status(500).send('Error processing message')
   }
 })
 

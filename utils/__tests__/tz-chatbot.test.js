@@ -58,6 +58,9 @@ describe('chat service', () => {
       const { tz: tz7 } = parseMessage('anna: !timeat Pacific/Port_Moresby')
       const { tz: tz8 } = parseMessage('anna: !timeat Etc/UTC')
       const { tz: tz9 } = parseMessage('anna: !timeat America/Port-au-Prince')
+      const { tz: tz10 } = parseMessage('anna: !timeat GMT')
+      const { tz: tz11 } = parseMessage('anna: !timeat GMT-7')
+      const { tz: tz12 } = parseMessage('anna: !timeat GMT+1')
 
       expect(tz1).toBe('America/Argentina/Buenos_Aires')
       expect(tz2).toBe('PST8PDT')
@@ -68,6 +71,9 @@ describe('chat service', () => {
       expect(tz7).toBe('Pacific/Port_Moresby')
       expect(tz8).toBe('Etc/UTC')
       expect(tz9).toBe('America/Port-au-Prince')
+      expect(tz10).toBe('Etc/GMT')
+      expect(tz11).toBe('Etc/GMT-7')
+      expect(tz12).toBe('Etc/GMT+1')
     });
 
     it('should throw an error if the message is not in the correct format', () => {

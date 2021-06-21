@@ -43,12 +43,14 @@ const parseMessage = (msg = '') => {
   let command = null
 
   if (isCommand) {
-    const tzRegex = new RegExp(/\S([a-zA-Z0-9]+)((\/([a-z_A-Z0-9\-+]+)){0,3})/g)
+    const tzRegex = new RegExp(/\S([a-zA-Z0-9\-+]+)((\/([a-z_A-Z0-9\-+]+)){0,3})/g)
     const matchArr = msgArr[1].match(tzRegex)
     command = matchArr[0]
-    tz = matchArr[1]
+    // Considering the special case of GMT and linking it to Etc/GMT
+    tz = /^GMT/i.test(matchArr[1]) ? `Etc/${matchArr[1]}` : matchArr[1]
   }
 
+  logger.debug(tz)
   return {
     username: msgArr[0],
     message: msgArr[1],
