@@ -20,12 +20,12 @@ module.exports = function () {
     // <username>: <message> according to requirements
     const msg = `${from}: ${message}`
     try {
-      const { err, response } = await processMessage(msg)
+      const { err, response, username } = await processMessage(msg)
       if (err) {
         return client.say(options.channel, err)
       }
       if (response) {
-        return client.say(options.channel, response)
+        return client.say(options.channel, `${username}: ${response}`)
       }
       return true
     } catch (e) {

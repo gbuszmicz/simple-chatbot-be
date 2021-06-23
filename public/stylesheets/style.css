@@ -1,0 +1,27 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+input[type=text] {
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  min-width: 400px;
+  max-width: 600px;
+}
+code {
+  background-color: #e6e6e6;
+}
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+li.socket-event {
+  font-style: italic;
+}
+li.user-event {
+  font-weight: bold;
+}
+a {
+  color: #00B7FF;
+}

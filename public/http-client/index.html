@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Http client</title>
+  <link rel="shortcut icon" type="image/jpg" href="/images/bot.png" />
+  <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+  <h1>Http client</h1>
+  Swith to <a href="/websocket-client">Websocket client</a> or go to <a
+    href="https://webchat.freenode.net/?channel=#tz-testing-bot" target="_blank">irc web client</a>
+  <p>Just enter an action and wait for the response.<br>Availabe actions are:</p>
+  <code>
+   &nbsp;&nbsp;- !timeat TIMEZONE <br>
+   &nbsp;&nbsp;- !timepopularity PREFIX_OR_TIMEZONE<br>
+  </code>
+  <p>Message format is: <code> username: message </code></p>
+  <input type="text" id="inputMessage" placeholder="anna: !timeat America/Chicago" />
+  <div>
+    <ul id="messages"></ul>
+  </div>
+
+  <script src="/http-client/main.js"></script>
+</body>
+
+</html>

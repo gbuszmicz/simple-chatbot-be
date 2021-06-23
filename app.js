@@ -1,5 +1,6 @@
 const express = require('express')
 const helmet = require('helmet')
+const path = require('path')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const { routes } = require('./routes')
@@ -11,6 +12,7 @@ app.use(cors())
 app.use(helmet())
 app.use(bodyParser.json())
 app.use(express.urlencoded({ extended: false }))
+app.use('/', express.static(path.join(__dirname, 'public')))
 app.use(loggerMiddleware)
 
 // Log all request
