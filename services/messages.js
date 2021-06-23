@@ -36,7 +36,8 @@ const processMessage = async msg => {
 
     return {
       err: null,
-      response: response ? `${username}: ${response}` : null
+      response,
+      username
     }
 
   } catch (e) {

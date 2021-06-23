@@ -1,10 +1,26 @@
 require('dotenv-flow').config()
 const axios = require('axios')
-const { parseMessage, getCurrentTime } = require('../tz-chatbot')
 const { logger } = require('../logger')
+const { cacheManager } = require('../cache')
+const { parseMessage, getCurrentTime, updatePopularityStats, getTimePopularity } = require('../tz-chatbot')
+
+let mockCacheGetValue = jest.fn().mockReturnValue(() => Promise.resolve())
+jest.mock('../cache', () => ({
+  cacheManager: jest.fn(() => ({
+    connect: jest.fn(() => true),
+    disconnect: jest.fn(() => true),
+    set: jest.fn().mockReturnValue(() => Promise.resolve()),
+    get: mockCacheGetValue,
+    del: jest.fn().mockReturnValue(() => Promise.resolve()),
+    incr: jest.fn().mockReturnValue(() => Promise.resolve())
+  }))
+}))
 
 jest.mock('axios')
 
+beforeEach(() => {
+  cacheManager.mockClear()
+})
 
 describe('chat service', () => {
   describe('## parseMessage', () => {
@@ -95,7 +111,6 @@ describe('chat service', () => {
 
     it('should return the current time correctly', async () => {
       const tz = 'America/Argentina/Buenos_Aires'
-      logger.debug = jest.fn()
       axios.get.mockResolvedValue({
         data: {
           abbreviation: '-03',
@@ -108,29 +123,28 @@ describe('chat service', () => {
       })
       const { err, time } = await getCurrentTime(tz)
       expect(axios.get).toBeCalledWith(`${process.env.TIME_API}/timezone/${tz}`)
-      expect(logger.debug).toHaveBeenCalledTimes(3)
       expect(err).toBe(null)
       expect(time).toBe('20 Jun 2021 19:20')
     })
 
-    it('should return an error if tz is incorrect', async () => {
+    it('should throw an error if tz is incorrect', async () => {
       const tz = 'Nowhere'
-      logger.debug = jest.fn()
-      axios.get.mockResolvedValue({
-        data: {
-          error: 'unknown location'
-        },
-        status: 404
-      })
+      logger.error = jest.fn()
+      // eslint-disable-next-line prefer-promise-reject-errors
+      axios.get.mockReturnValue(Promise.reject({
+        response: {
+          status: 404
+        }
+      }))
       const { err, time } = await getCurrentTime(tz)
       expect(axios.get).toBeCalledWith(`${process.env.TIME_API}/timezone/${tz}`)
       expect(err).toBe('unknown timezone')
+      expect(logger.error).toHaveBeenCalledTimes(1)
       expect(time).toBe(undefined)
     })
 
     it('should return an error if tz is just a prefix', async () => {
       const tz = 'America'
-      logger.debug = jest.fn()
       axios.get.mockResolvedValue({
         data: [
           'America/Adak',
@@ -149,6 +163,86 @@ describe('chat service', () => {
       expect(axios.get).toBeCalledWith(`${process.env.TIME_API}/timezone/${tz}`)
       expect(err).toBe('unknown timezone')
       expect(time).toBe(undefined)
+    })
+  })
+
+  describe('## updatePopularityStats', () => {
+    it('should update popularity stats correctly for a single prefix timezone', async () => {
+      const tz = 'GMT'
+      await updatePopularityStats(tz)
+
+      expect(cacheManager).toHaveBeenCalledTimes(1)
+      const cache = cacheManager.mock.results[0].value
+
+      expect(cache.connect).toHaveBeenCalledTimes(1)
+      expect(cache.incr).toBeCalledWith(tz)
+      expect(cache.incr).toHaveBeenCalledTimes(1)
+      expect(cache.disconnect).toHaveBeenCalledTimes(1)
+    })
+
+    it('should update popularity stats correctly for a multiple prefix timezone', async () => {
+      const tz = 'America/Argentina/Buenos_Aires'
+      await updatePopularityStats(tz)
+
+      expect(cacheManager).toHaveBeenCalledTimes(1)
+      const cache = cacheManager.mock.results[0].value
+
+      expect(cache.connect).toHaveBeenCalledTimes(1)
+      expect(cache.incr).toHaveBeenNthCalledWith(1, 'America/Argentina/Buenos_Aires')
+      expect(cache.incr).toHaveBeenNthCalledWith(2, 'America/Argentina')
+      expect(cache.incr).toHaveBeenNthCalledWith(3, 'America')
+      expect(cache.incr).toHaveBeenCalledTimes(3)
+      expect(cache.disconnect).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('## getTimePopularity', () => {
+    it('should get the time popularity from the cache correctly', async () => {
+      mockCacheGetValue = jest.fn().mockResolvedValue(99)
+      const tz = 'GMT'
+      const count = await getTimePopularity(tz)
+
+      expect(cacheManager).toHaveBeenCalledTimes(1)
+      const cache = cacheManager.mock.results[0].value
+
+      expect(cache.connect).toHaveBeenCalledTimes(1)
+      expect(cache.get).toBeCalledWith(tz)
+      expect(cache.set).not.toHaveBeenCalled()
+      expect(cache.disconnect).toHaveBeenCalledTimes(1)
+      expect(count).toBe(99)
+    })
+
+    it('should set time popularity for a timezone when no value was found in the cache', async () => {
+      mockCacheGetValue = jest.fn().mockResolvedValue(0)
+      const tz = 'GMT'
+      const count = await getTimePopularity(tz)
+
+      expect(cacheManager).toHaveBeenCalledTimes(1)
+      const cache = cacheManager.mock.results[0].value
+
+      expect(cache.connect).toHaveBeenCalledTimes(1)
+      expect(cache.get).toBeCalledWith(tz)
+      expect(cache.set).toBeCalledWith(tz, 1)
+      expect(cache.disconnect).toHaveBeenCalledTimes(1)
+      expect(count).toBe(1)
+    })
+
+    it('should throw an error if failed to call the cache', async () => {
+      logger.error = jest.fn()
+      mockCacheGetValue = jest.fn().mockRejectedValue(new Error('get error'))
+      const tz = 'GMT'
+      try {
+        await getTimePopularity(tz)
+      } catch (e) {
+        expect(cacheManager).toHaveBeenCalledTimes(1)
+        const cache = cacheManager.mock.results[0].value
+
+        expect(cache.connect).toHaveBeenCalledTimes(1)
+        expect(cache.get).toBeCalledWith(tz)
+        expect(cache.disconnect).not.toHaveBeenCalled()
+        expect(logger.error).toHaveBeenCalledTimes(1)
+        expect(e.message).toBe('get error')
+      }
     })
   })
 })

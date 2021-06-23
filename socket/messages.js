@@ -7,16 +7,19 @@ module.exports = function (server) {
   io.on('connection', (socket) => {
     logger.info(`new user connected with socket id ${socket.id}`)
 
+    // eslint-disable-next-line consistent-return
     socket.on('message', async (msg) => {
       try {
         const { err, response } = await processMessage(msg)
         if (err) {
           return socket.emit('error', err)
         }
-        return socket.emit('response', response)
+        if (response) {
+          return socket.emit('response', response)
+        }
       } catch (e) {
         logger.error(e)
-        return socket.emit('error', 'internal server error')
+        return socket.emit('error', 'mmm... didn\'t get that 🤔')
       }
     })
 
