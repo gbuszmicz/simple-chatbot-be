@@ -18,13 +18,13 @@ An MVP of a chatbot service that could be called from an IRC channel. The input 
 A “prefix” is defined as any characters before a / in a tzinfo string - in America/Chicago, America would be the prefix, while in America/Argentina/Buenos_Aires, America and America/Argentina would be the prefixes. A command of `!timepopularity America` would return the number of `!timeat` requests for anywhere in the Americas, and a command of `!timepopularity America/Argentina` would return the number of !timeat requests for anywhere in Argentina.
 The format of the response is just a number, like `9`. In the case of IRC, it's also mentioning the user that made the request.
 
-Currently, the chatbot service can be requested through 3 different channels:
+Currently, the chatbot service can be accessed through 3 different channels:
 
 - http
 - websockets
 - IRC
 
-As soon as the service is up and running, you can test it using one of the client implementation you can found at root level (`http://localhost:3000/`)
+As soon as the service is up and running, you can test it using one of the clients implementation at root level (`http://localhost:3000/`)
 
 ## Running the Service Locally
 
