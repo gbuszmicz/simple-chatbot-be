@@ -69,7 +69,7 @@ const parseMessage = (msg = '') => {
  * !timeat requests for anywhere in the Americas, and a command of timepopularity
  * America/Argentina would return the number of !timeat requests for anywhere in Argentina.
  * @param {string} tz - Timezone
- * @returns {Promise}
+ * @return
  */
 const updatePopularityStats = async tz => {
   try {
@@ -98,6 +98,7 @@ const updatePopularityStats = async tz => {
 /**
  * Get the current time at a location
  * @param {string} tz - Timezone. List of options http://worldtimeapi.org/api/timezone 
+ * @param {string} formatOptions - Format the response
  * @returns {string}
  */
 const getCurrentTime = async (tz, formatOption = 'D MMM YYYY H:mm') => {

@@ -28,7 +28,6 @@ const processMessage = async msg => {
       }
 
       if (command === commands.timePopularity) {
-        // Get popularity and store result in the cache for next time
         const popularity = await getTimePopularity(tz)
         response = popularity.toString()
       }
