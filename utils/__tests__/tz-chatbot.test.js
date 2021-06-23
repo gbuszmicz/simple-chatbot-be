@@ -40,7 +40,7 @@ describe('chat service', () => {
       expect(username).toBe('anna')
       expect(message).toBe('!timepopularity America/New_York')
       expect(command).toBe('!timepopularity')
-      expect(tz).toBe('America/New_York')
+      expect(tz).toBe('america/new_york')
       expect(isCommand).toBeTruthy()
     });
 
@@ -51,7 +51,7 @@ describe('chat service', () => {
       expect(username).toBe('anna')
       expect(message).toBe('!timeat America/Argentina/Buenos_Aires')
       expect(command).toBe('!timeat')
-      expect(tz).toBe('America/Argentina/Buenos_Aires')
+      expect(tz).toBe('america/argentina/buenos_aires')
       expect(isCommand).toBeTruthy()
     });
 
@@ -60,7 +60,7 @@ describe('chat service', () => {
       const { message, isCommand, command } = parseMessage(userMessage)
 
       expect(message).toBe('       !timeat America/Chicago')
-      expect(command).toBe(null)
+      expect(command).toBe(undefined)
       expect(isCommand).toBeFalsy()
     });
 
@@ -78,18 +78,18 @@ describe('chat service', () => {
       const { tz: tz11 } = parseMessage('anna: !timeat GMT-7')
       const { tz: tz12 } = parseMessage('anna: !timeat GMT+1')
 
-      expect(tz1).toBe('America/Argentina/Buenos_Aires')
-      expect(tz2).toBe('PST8PDT')
-      expect(tz3).toBe('Etc/GMT+10')
-      expect(tz4).toBe('Etc/GMT-7')
-      expect(tz5).toBe('Europe/Amsterdam')
-      expect(tz6).toBe('HST')
-      expect(tz7).toBe('Pacific/Port_Moresby')
-      expect(tz8).toBe('Etc/UTC')
-      expect(tz9).toBe('America/Port-au-Prince')
-      expect(tz10).toBe('Etc/GMT')
-      expect(tz11).toBe('Etc/GMT-7')
-      expect(tz12).toBe('Etc/GMT+1')
+      expect(tz1).toBe('america/argentina/buenos_aires')
+      expect(tz2).toBe('pst8pdt')
+      expect(tz3).toBe('etc/gmt+10')
+      expect(tz4).toBe('etc/gmt-7')
+      expect(tz5).toBe('europe/amsterdam')
+      expect(tz6).toBe('hst')
+      expect(tz7).toBe('pacific/port_moresby')
+      expect(tz8).toBe('etc/utc')
+      expect(tz9).toBe('america/port-au-prince')
+      expect(tz10).toBe('etc/gmt')
+      expect(tz11).toBe('etc/gmt-7')
+      expect(tz12).toBe('etc/gmt+1')
     });
 
     it('should throw an error if the message is not in the correct format', () => {

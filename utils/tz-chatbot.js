@@ -39,15 +39,16 @@ const parseMessage = (msg = '') => {
 
   const cmdRegex = new RegExp(/^!(timeat|timepopularity)\s/i)
   const isCommand = cmdRegex.test(msgArr[1])
-  let tz = null
-  let command = null
+  let tz
+  let command
 
   if (isCommand) {
     const tzRegex = new RegExp(/\S([a-zA-Z0-9\-+]+)((\/([a-z_A-Z0-9\-+]+)){0,3})/g)
     const matchArr = msgArr[1].match(tzRegex)
-    command = matchArr[0].toLowerCase()
+    command = matchArr[0] ? matchArr[0].toLowerCase() : null
     // Considering the special case of GMT and linking it to Etc/GMT
-    tz = /^GMT/i.test(matchArr[1]) ? `Etc/${matchArr[1]}` : matchArr[1]
+    const tzSpecialCase = /^GMT/i.test(matchArr[1]) ? `Etc/${matchArr[1]}` : matchArr[1]
+    tz = tzSpecialCase ? tzSpecialCase.toLowerCase() : null
   }
 
   return {
