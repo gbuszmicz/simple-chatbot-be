@@ -142,17 +142,8 @@ const getTimePopularity = async tz => {
     const cache = cacheManager()
     cache.connect()
     const results = await cache.get(tz)
-    // We found the results in the cache, lets return it
-    if (results) {
-      cache.disconnect()
-      return results
-    }
-    // Cache is empty so this is the first time
-    const count = 1
-    await cache.set(tz, count)
     cache.disconnect()
-    return count
-
+    return results || 0
   } catch (e) {
     logger.error(e)
     throw e

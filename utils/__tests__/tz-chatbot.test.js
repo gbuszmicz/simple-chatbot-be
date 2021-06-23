@@ -9,9 +9,7 @@ jest.mock('../cache', () => ({
   cacheManager: jest.fn(() => ({
     connect: jest.fn(() => true),
     disconnect: jest.fn(() => true),
-    set: jest.fn().mockReturnValue(() => Promise.resolve()),
     get: mockCacheGetValue,
-    del: jest.fn().mockReturnValue(() => Promise.resolve()),
     incr: jest.fn().mockReturnValue(() => Promise.resolve())
   }))
 }))
@@ -207,13 +205,12 @@ describe('chat service', () => {
 
       expect(cache.connect).toHaveBeenCalledTimes(1)
       expect(cache.get).toBeCalledWith(tz)
-      expect(cache.set).not.toHaveBeenCalled()
       expect(cache.disconnect).toHaveBeenCalledTimes(1)
       expect(count).toBe(99)
     })
 
-    it('should set time popularity for a timezone when no value was found in the cache', async () => {
-      mockCacheGetValue = jest.fn().mockResolvedValue(0)
+    it('should return 0 if no time popularity was found in the cache for the selected timezone', async () => {
+      mockCacheGetValue = jest.fn().mockResolvedValue(null)
       const tz = 'GMT'
       const count = await getTimePopularity(tz)
 
@@ -222,12 +219,11 @@ describe('chat service', () => {
 
       expect(cache.connect).toHaveBeenCalledTimes(1)
       expect(cache.get).toBeCalledWith(tz)
-      expect(cache.set).toBeCalledWith(tz, 1)
       expect(cache.disconnect).toHaveBeenCalledTimes(1)
-      expect(count).toBe(1)
+      expect(count).toBe(0)
     })
 
-    it('should throw an error if failed to call the cache', async () => {
+    it('should throw an error if it failed calling the cache', async () => {
       logger.error = jest.fn()
       mockCacheGetValue = jest.fn().mockRejectedValue(new Error('get error'))
       const tz = 'GMT'

@@ -21,17 +21,9 @@ const cacheManager = () => {
   const disconnect = () => {
     client.quit();
   }
-  const set = async (key, value) => {
-    const setAsync = promisify(client.set).bind(client);
-    return setAsync(key, value)
-  }
   const get = async (key) => {
     const getAsync = promisify(client.get).bind(client);
     return getAsync(key)
-  }
-  const del = async (key) => {
-    const delAsync = promisify(client.del).bind(client);
-    return delAsync(key)
   }
   const incr = async (key) => {
     const incrAsync = promisify(client.incr).bind(client);
@@ -40,9 +32,7 @@ const cacheManager = () => {
   return {
     connect,
     disconnect,
-    set,
     get,
-    del,
     incr
   }
 }
