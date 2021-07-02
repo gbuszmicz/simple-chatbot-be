@@ -14,7 +14,8 @@ const { logger } = require('../utils/logger')
 const processMessage = async msg => {
   try {
     // Parse user's message
-    const { username, isCommand, command, tz } = parseMessage()
+    const test = 'test'
+    const { username, isCommand, command, tz } = parseMessage({ msg, test })
     let response
     // User is executing a command (timeat || timepopularity)
     if (isCommand && tz && command) {
